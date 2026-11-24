@@ -1,0 +1,27 @@
+// The complete address space of the Hack computer (RAM + memory-mapped I/O).
+//
+//   address  0     .. 16383 (0x0000-0x3FFF) -> RAM16K   (address[14] = 0)
+//   address  16384 .. 24575 (0x4000-0x5FFF) -> Screen   (address[14..13] = 10)
+//   address  24576          (0x6000)        -> Keyboard (address[14..13] = 11)
+//
+// out is always the value stored at address.
+// If load == 1, in is written to address (the keyboard is read-only).
+CHIP Memory {
+    IN in[16], load, address[15];
+    OUT out[16];
+
+    PARTS:
+    // Send load to RAM or to the I/O half, using the top address bit.
+    DMux(in=load, sel=address[14], a=loadRam, b=loadIO);
+    // Inside the I/O half, bit 13 picks Screen (0) or Keyboard (1).
+    DMux(in=loadIO, sel=address[13], a=loadScreen, b=loadKbd);
+
+    RAM16K(in=in, load=loadRam, address=address[0..13], out=ramOut);
+    Screen(in=in, load=loadScreen, address=address[0..12], out=screenOut);
+    Keyboard(out=kbdOut);
+
+    // Pick the output with bits 14 and 13:
+    //   00, 01 -> RAM    10 -> Screen    11 -> Keyboard
+    Mux4Way16(a=ramOut, b=ramOut, c=screenOut, d=kbdOut,
+              sel=address[13..14], out=out);
+}
