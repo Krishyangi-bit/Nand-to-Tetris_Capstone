@@ -137,7 +137,7 @@ To check against the **official assembler** (Add, Max, Rect and Pong):
 python assembler.py Pong.asm -o Pong.mine.hack
 # assemble Pong.asm with the official Assembler -> Pong.hack
 python tests/compare.py Pong.mine.hack Pong.hack
-# MATCH: <n> instructions are identical.
+# MATCH: 27483 instructions are identical.
 ```
 
 ---
@@ -182,14 +182,18 @@ After editing, re-run `python assembler.py Box.asm` and reload `Box.hack`.
 
 | Check | Result |
 |---|---|
-| Gates, multi-bit and multi-way chips (exhaustive / random) | pass |
-| ALU vs a reference model, 300 random inputs and flag checks | pass |
-| RAM64, PC vs reference models (random sequences) | pass |
-| Memory address map (RAM / Screen / Keyboard, keyboard read-only) | pass |
-| Computer running Add and Max (several inputs), and Rect | pass |
-| Assembler: Add.hack identical to the official output, Max/Rect correct | pass |
+| Official `CPU.tst` / `CPU-external.tst` (96 rows each) vs `.cmp` | pass |
+| Official `Memory.tst` (67 rows, incl. keyboard K / Y) vs `.cmp` | pass |
+| Official `ComputerAdd.tst`, `ComputerMax.tst`, `ComputerRect.tst` vs `.cmp` | pass |
+| Gates, ALU (300 random cases), RAM64, PC vs reference models | pass |
+| Assembler: Add, Max, Rect identical to the official `.hack` files | pass |
+| Assembler: Pong.asm = PongL.asm output (27483 instructions), also Max/MaxL, Rect/RectL | pass |
 | Assembler unit tests (15) | pass |
-| Box.hack: key held → 20 black words at 18176 … 18784; released → screen clear | pass |
+| Box.hack on the HDL Computer: key held → 20 black words at 18176 … 18784; released → screen clear | pass |
+
+> The official test scripts were replayed, row by row, against these HDL files
+> with a script-level replay of the `.tst` files. Running them in the real
+> Hardware Simulator (Part A steps above) is still needed for the report screenshots.
 
 ---
 
