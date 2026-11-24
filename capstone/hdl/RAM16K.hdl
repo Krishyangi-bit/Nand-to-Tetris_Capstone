@@ -1,0 +1,15 @@
+// RAM16K: 4 x RAM4K = 16384 registers.
+// If load == 1, RAM[address](t+1) = in(t). out is always RAM[address].
+CHIP RAM16K {
+    IN in[16], load, address[14];
+    OUT out[16];
+
+    PARTS:
+    // The top 2 address bits pick a RAM4K, the low 12 bits go inside it.
+    DMux4Way(in=load, sel=address[12..13], a=loadA, b=loadB, c=loadC, d=loadD);
+    RAM4K(in=in, load=loadA, address=address[0..11], out=rA);
+    RAM4K(in=in, load=loadB, address=address[0..11], out=rB);
+    RAM4K(in=in, load=loadC, address=address[0..11], out=rC);
+    RAM4K(in=in, load=loadD, address=address[0..11], out=rD);
+    Mux4Way16(a=rA, b=rB, c=rC, d=rD, sel=address[12..13], out=out);
+}
