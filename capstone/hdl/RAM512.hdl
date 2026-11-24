@@ -1,0 +1,19 @@
+// RAM512: 8 x RAM64 = 512 registers.
+// If load == 1, RAM[address](t+1) = in(t). out is always RAM[address].
+CHIP RAM512 {
+    IN in[16], load, address[9];
+    OUT out[16];
+
+    PARTS:
+    // The top 3 address bits pick a RAM64, the low bits go inside it.
+    DMux8Way(in=load, sel=address[6..8], a=loadA, b=loadB, c=loadC, d=loadD, e=loadE, f=loadF, g=loadG, h=loadH);
+    RAM64(in=in, load=loadA, address=address[0..5], out=rA);
+    RAM64(in=in, load=loadB, address=address[0..5], out=rB);
+    RAM64(in=in, load=loadC, address=address[0..5], out=rC);
+    RAM64(in=in, load=loadD, address=address[0..5], out=rD);
+    RAM64(in=in, load=loadE, address=address[0..5], out=rE);
+    RAM64(in=in, load=loadF, address=address[0..5], out=rF);
+    RAM64(in=in, load=loadG, address=address[0..5], out=rG);
+    RAM64(in=in, load=loadH, address=address[0..5], out=rH);
+    Mux8Way16(a=rA, b=rB, c=rC, d=rD, e=rE, f=rF, g=rG, h=rH, sel=address[6..8], out=out);
+}
