@@ -1,0 +1,11 @@
+// Or gate: out = a or b
+// De Morgan: a or b = not(not a and not b) = Nand(not a, not b)
+CHIP Or {
+    IN a, b;
+    OUT out;
+
+    PARTS:
+    Not(in=a, out=notA);
+    Not(in=b, out=notB);
+    Nand(a=notA, b=notB, out=out);
+}
