@@ -1,0 +1,40 @@
+// Hack ALU. Computes one of several functions of x and y.
+//   zx: x = 0        nx: x = !x
+//   zy: y = 0        ny: y = !y
+//   f : out = x + y (if 1) or x & y (if 0)
+//   no: out = !out
+//   zr: 1 if out == 0       ng: 1 if out < 0
+CHIP ALU {
+    IN
+        x[16], y[16],
+        zx, nx, zy, ny, f, no;
+    OUT
+        out[16], zr, ng;
+
+    PARTS:
+    // Prepare x
+    Mux16(a=x, b=false, sel=zx, out=x1);
+    Not16(in=x1, out=notX1);
+    Mux16(a=x1, b=notX1, sel=nx, out=x2);
+
+    // Prepare y
+    Mux16(a=y, b=false, sel=zy, out=y1);
+    Not16(in=y1, out=notY1);
+    Mux16(a=y1, b=notY1, sel=ny, out=y2);
+
+    // Compute x + y or x & y
+    Add16(a=x2, b=y2, out=sum);
+    And16(a=x2, b=y2, out=andXY);
+    Mux16(a=andXY, b=sum, sel=f, out=fOut);
+
+    // Negate the output if asked, and split it for the flags
+    Not16(in=fOut, out=notFOut);
+    Mux16(a=fOut, b=notFOut, sel=no,
+          out=out, out[15]=ng, out[0..7]=low, out[8..15]=high);
+
+    // zr = 1 when every bit of out is 0
+    Or8Way(in=low, out=lowAny);
+    Or8Way(in=high, out=highAny);
+    Or(a=lowAny, b=highAny, out=anyOne);
+    Not(in=anyOne, out=zr);
+}
