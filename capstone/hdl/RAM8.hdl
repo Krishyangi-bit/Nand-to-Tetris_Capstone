@@ -1,0 +1,18 @@
+// RAM8: 8 registers. address picks which one is read or written.
+// If load == 1, RAM[address](t+1) = in(t). out is always RAM[address].
+CHIP RAM8 {
+    IN in[16], load, address[3];
+    OUT out[16];
+
+    PARTS:
+    DMux8Way(in=load, sel=address, a=loadA, b=loadB, c=loadC, d=loadD, e=loadE, f=loadF, g=loadG, h=loadH);
+    Register(in=in, load=loadA, out=rA);
+    Register(in=in, load=loadB, out=rB);
+    Register(in=in, load=loadC, out=rC);
+    Register(in=in, load=loadD, out=rD);
+    Register(in=in, load=loadE, out=rE);
+    Register(in=in, load=loadF, out=rF);
+    Register(in=in, load=loadG, out=rG);
+    Register(in=in, load=loadH, out=rH);
+    Mux8Way16(a=rA, b=rB, c=rC, d=rD, e=rE, f=rF, g=rG, h=rH, sel=address, out=out);
+}
